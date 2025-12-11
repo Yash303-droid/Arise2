@@ -7,9 +7,9 @@ class Reward {
 
   factory Reward.fromJson(Map<String, dynamic> json) {
     return Reward(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? 'Unknown Reward',
-      cost: json['cost'] ?? 0,
+      id: int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+      name: json['name']?.toString() ?? 'Unknown Reward',
+      cost: int.tryParse(json['cost']?.toString() ?? '0') ?? 0,
     );
   }
 }

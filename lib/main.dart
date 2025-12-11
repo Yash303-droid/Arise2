@@ -3,6 +3,7 @@ import 'package:arise2/screens/auth_screen.dart';
 import 'package:arise2/screens/main_screen.dart';
 import 'package:arise2/services/api_client.dart';
 import 'package:arise2/services/auth_service.dart';
+import 'package:arise2/view_models/auth_viewmodel.dart';
 import 'package:arise2/viewmodels/auth_viewmodel.dart';
 import 'package:arise2/view_models/game_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +35,7 @@ class AriseApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Arise2',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,

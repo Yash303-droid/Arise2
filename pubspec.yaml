@@ -41,6 +41,8 @@ dependencies:
   confetti: ^0.8.0
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
+
   flutter_test:
     sdk: flutter
 
@@ -64,7 +66,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/
+    - assets/images/Ariselogo.png
+    - assets/images/Ariselogo.png
     - assets/animations/
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -92,3 +95,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/Ariselogo.png"
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/images/Ariselogo.png"
+  

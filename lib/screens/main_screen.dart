@@ -1,10 +1,13 @@
 import 'dart:ui';
 
 import 'package:arise2/screens/achievements_screen.dart';
-import 'package:arise2/screens/habits_screen.dart';
 import 'package:arise2/screens/dashboard_screen.dart';
+import 'package:arise2/screens/habits_screen.dart';
+import 'package:arise2/view_models/auth_viewmodel.dart';
+import 'package:arise2/viewmodels/auth_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:arise2/widgets/add_habit_form.dart';
+import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -73,7 +76,18 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: Text(_widgetTitles.elementAt(_selectedIndex)),
         centerTitle: true,
-        backgroundColor: (_selectedIndex == 0 || _selectedIndex == 1) ? Colors.black.withOpacity(0.5) : null,
+        backgroundColor: (_selectedIndex == 0 || _selectedIndex == 1)
+            ? Colors.black.withOpacity(0.5)
+            : null,
+        actions: [
+          if (_selectedIndex == 1)
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.redAccent),
+              onPressed: () {
+                Provider.of<AuthViewModel>(context, listen: false).logout();
+              },
+            ),
+        ],
       ),
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton.extended(

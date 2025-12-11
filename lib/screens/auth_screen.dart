@@ -1,4 +1,4 @@
-import 'package:arise2/viewmodels/auth_viewmodel.dart';
+import 'package:arise2/view_models/auth_viewmodel.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

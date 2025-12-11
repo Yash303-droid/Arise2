@@ -27,17 +27,17 @@ class Profile {
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     return Profile(
-      id: json['id'] ?? json['user_id'] ?? 0,
-      username: json['username'] ?? json['name'] ?? 'Hero',
-      email: json['email'] ?? '',
-      level: json['level'] ?? json['lvl'] ?? 1,
-      xp: json['xp'] ?? json['experience'] ?? 0,
-      gold: json['gold'] ?? json['coins'] ?? 0,
-      health: json['health'] ?? 0,
-      mana: json['mana'] ?? 0,
-      streak: json['streak'] ?? 0,
-      longestStreak: json['longest_streak'] ?? json['longestStreak'] ?? 0,
-      rank: json['rank'] ?? '',
+      id: int.tryParse(json['id']?.toString() ?? json['user_id']?.toString() ?? '0') ?? 0,
+      username: json['username']?.toString() ?? json['name']?.toString() ?? 'Hero',
+      email: json['email']?.toString() ?? '',
+      level: int.tryParse(json['level']?.toString() ?? json['lvl']?.toString() ?? '1') ?? 1,
+      xp: int.tryParse(json['xp']?.toString() ?? json['experience']?.toString() ?? '0') ?? 0,
+      gold: int.tryParse(json['gold']?.toString() ?? json['coins']?.toString() ?? '0') ?? 0,
+      health: int.tryParse(json['health']?.toString() ?? '0') ?? 0,
+      mana: int.tryParse(json['mana']?.toString() ?? '0') ?? 0,
+      streak: int.tryParse(json['streak']?.toString() ?? '0') ?? 0,
+      longestStreak: int.tryParse(json['longest_streak']?.toString() ?? json['longestStreak']?.toString() ?? '0') ?? 0,
+      rank: json['rank']?.toString() ?? 'Unranked',
     );
   }
 

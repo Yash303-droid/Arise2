@@ -123,7 +123,7 @@ class HabitsScreenState extends State<HabitsScreen> {
 }
 
 
-class HabitListItem extends StatelessWidget {
+class HabitListItem extends StatefulWidget {
   const HabitListItem({
     super.key,
     required this.habit,
@@ -132,8 +132,39 @@ class HabitListItem extends StatelessWidget {
   final Habit habit;
 
   @override
+  State<HabitListItem> createState() => _HabitListItemState();
+}
+
+class _HabitListItemState extends State<HabitListItem> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<Offset> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _animation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0.2, 0.0),
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final bool isCompleted = habit.completed;
+    final bool isCompleted = widget.habit.completed;
     return Card(
       color: Colors.white.withOpacity(0.1),
       margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -147,11 +178,11 @@ class HabitListItem extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(habit.type == 'good' ? Icons.check_circle_outline : Icons.remove_circle_outline, color: Colors.white, size: 28),
+                Icon(widget.habit.type == 'good' ? Icons.check_circle_outline : Icons.remove_circle_outline, color: Colors.white, size: 28),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    habit.name,
+                    widget.habit.name,
                     style: TextStyle(
                       color: isCompleted ? Colors.white54 : Colors.white,
                       decoration:
@@ -161,11 +192,29 @@ class HabitListItem extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(width: 8),
+                SlideTransition(
+                  position: _animation,
+                  child: Row(
+                    children: [
+                      Text(
+                        'Swipe to done',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.5),
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(Icons.arrow_forward_ios, color: Colors.white.withOpacity(0.5), size: 16),
+                    ],
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 8),
             Text(
-              habit.nature.toUpperCase(), // Display nature as description/tag
+              widget.habit.nature.toUpperCase(), // Display nature as description/tag
               style: TextStyle(
                 color: isCompleted ? Colors.white38 : Colors.white70,
               ),
@@ -175,7 +224,7 @@ class HabitListItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '+${habit.xpValue} XP',
+                  '+${widget.habit.xpValue} XP',
                   style: const TextStyle(
                     color: Colors.amber,
                     fontWeight: FontWeight.bold,

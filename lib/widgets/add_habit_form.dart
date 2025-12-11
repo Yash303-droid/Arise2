@@ -43,102 +43,112 @@ class _AddHabitFormState extends State<AddHabitForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextFormField(
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-              labelText: 'Habit Title',
-              labelStyle: TextStyle(color: Colors.white70),
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Please enter a title.';
-              }
-              final gameVM = Provider.of<GameViewModel>(context, listen: false);
-              final exists = gameVM.habits.any(
-                (h) => h.name.toLowerCase() == value.trim().toLowerCase(),
-              );
-              if (exists) {
-                return 'Habit already exists.';
-              }
-              return null;
-            },
-            onSaved: (value) {
-              _title = value!;
-            },
-          ),
-          TextFormField(
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-              labelText: 'XP Reward (optional)',
-              labelStyle: TextStyle(color: Colors.white70),
-            ),
-            initialValue: '10',
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) return null;
-              if (int.tryParse(value) == null) {
-                return 'Please enter a valid number.';
-              }
-              return null;
-            },
-            onSaved: (value) {
-              if (value == null || value.trim().isEmpty) {
-                _xp = null;
-              } else {
-                _xp = int.parse(value);
-              }
-            },
-          ),
-          const SizedBox(height: 8),
-          // Nature selector
-          DropdownButtonFormField<String>(
-            value: _nature,
-            decoration: const InputDecoration(
-              labelText: 'Nature',
-              labelStyle: TextStyle(color: Colors.white70),
-            ),
-            items: const [
-              DropdownMenuItem(value: 'mental', child: Text('Mental')),
-              DropdownMenuItem(value: 'physical', child: Text('Physical')),
-              DropdownMenuItem(value: 'social', child: Text('Social')),
-            ],
-            onChanged: (v) => setState(() { _nature = v ?? 'mental'; }),
-          ),
-          const SizedBox(height: 8),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        left: 16,
+        right: 16,
+        top: 16,
+      ),
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text(_isGoodHabit ? 'Good Habit' : 'Bad Habit', style: const TextStyle(color: Colors.white)),
-              Switch(
-                value: _isGoodHabit,
-                onChanged: (value) {
-                  setState(() {
-                    _isGoodHabit = value;
-                  });
+              TextFormField(
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  labelText: 'Habit Title',
+                  labelStyle: TextStyle(color: Colors.white70),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter a title.';
+                  }
+                  final gameVM = Provider.of<GameViewModel>(context, listen: false);
+                  final exists = gameVM.habits.any(
+                    (h) => h.name.toLowerCase() == value.trim().toLowerCase(),
+                  );
+                  if (exists) {
+                    return 'Habit already exists.';
+                  }
+                  return null;
                 },
-                activeColor: Colors.lightBlueAccent,
+                onSaved: (value) {
+                  _title = value!;
+                },
+              ),
+              TextFormField(
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  labelText: 'XP Reward (optional)',
+                  labelStyle: TextStyle(color: Colors.white70),
+                ),
+                initialValue: '10',
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) return null;
+                  if (int.tryParse(value) == null) {
+                    return 'Please enter a valid number.';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    _xp = null;
+                  } else {
+                    _xp = int.parse(value);
+                  }
+                },
+              ),
+              const SizedBox(height: 8),
+              // Nature selector
+              DropdownButtonFormField<String>(
+                value: _nature,
+                decoration: const InputDecoration(
+                  labelText: 'Nature',
+                  labelStyle: TextStyle(color: Colors.white70),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'mental', child: Text('Mental')),
+                  DropdownMenuItem(value: 'physical', child: Text('Physical')),
+                  DropdownMenuItem(value: 'social', child: Text('Social')),
+                ],
+                onChanged: (v) => setState(() { _nature = v ?? 'mental'; }),
+              ),
+              const SizedBox(height: 8),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(_isGoodHabit ? 'Good Habit' : 'Bad Habit', style: const TextStyle(color: Colors.white)),
+                  Switch(
+                    value: _isGoodHabit,
+                    onChanged: (value) {
+                      setState(() {
+                        _isGoodHabit = value;
+                      });
+                    },
+                    activeColor: Colors.lightBlueAccent,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _isProcessing ? null : _submit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightBlueAccent,
+                  foregroundColor: Colors.black,
+                ),
+                child: _isProcessing
+                    ? const SizedBox(
+                        width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Text('Add Habit'),
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: _isProcessing ? null : _submit,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.lightBlueAccent,
-              foregroundColor: Colors.black,
-            ),
-            child: _isProcessing
-                ? const SizedBox(
-                    width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                : const Text('Add Habit'),
-          ),
-        ],
+        ),
       ),
     );
   }
