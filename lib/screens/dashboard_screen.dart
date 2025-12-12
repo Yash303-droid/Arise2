@@ -1,16 +1,19 @@
+import 'package:arise2/screens/streak_viewmodel.dart';
 import 'package:arise2/utils/rank_system.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:arise2/view_models/game_viewmodel.dart';
 import 'package:arise2/viewmodels/auth_viewmodel.dart';
+import 'package:arise2/view_models/rewards_screen.dart';
+import 'package:arise2/screens/streak_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<GameViewModel>(
-      builder: (context, gameVM, child) {
+    return Consumer2<GameViewModel, StreakViewModel>(
+      builder: (context, gameVM, streakVM, child) {
         if (gameVM.isLoading) { 
           return const Center(child: CircularProgressIndicator());
         }
@@ -113,8 +116,26 @@ class DashboardScreen extends StatelessWidget {
                       _buildStatCard('Health', '${gameVM.profile?.health ?? 0}', Icons.favorite, Colors.red),
                       _buildStatCard('Mana', '${gameVM.profile?.mana ?? 0}', Icons.flash_on, Colors.cyan),
                       _buildStatCard('Completed', '$completedHabitsCount', Icons.done_all, Colors.green),
-                      _buildStatCard('Streak', '${gameVM.profile?.streak ?? 0}', Icons.whatshot, Colors.orange),
-                      _buildStatCard('Rewards', '${gameVM.rewards.length}', Icons.card_giftcard, Colors.purple),
+                      _buildStatCard(
+                        'Streak',
+                        '${streakVM.streakInfo?.appStreak ?? gameVM.profile?.streak ?? 0}',
+                        Icons.whatshot,
+                        Colors.orange,
+                        onTap: () async {
+                          await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const StreakScreen()));
+                          if (context.mounted) {
+                            Provider.of<GameViewModel>(context, listen: false).loadDashboardData();
+                            Provider.of<StreakViewModel>(context, listen: false).fetchStreakData();
+                          }
+                        },
+                      ),
+                      _buildStatCard(
+                        'Rewards',
+                        '${gameVM.rewards.length}',
+                        Icons.card_giftcard,
+                        Colors.purple,
+                        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const RewardsScreen())),
+                      ),
                     ],
                   ),
                 ],
@@ -126,26 +147,29 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 40, color: color),
-          const SizedBox(height: 10),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          Text(
-            title,
-            style: const TextStyle(color: Colors.white70),
-          ),
-        ],
+  Widget _buildStatCard(String title, String value, IconData icon, Color color, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 40, color: color),
+            const SizedBox(height: 10),
+            Text(
+              value,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            Text(
+              title,
+              style: const TextStyle(color: Colors.white70),
+            ),
+          ],
+        ),
       ),
     );
   }
