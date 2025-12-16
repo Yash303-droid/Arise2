@@ -20,24 +20,6 @@ class Habit {
   });
 
   factory Habit.fromJson(Map<String, dynamic> json) {
-    bool isCompleted = json['completed'] ?? false;
-
-    // Check if last_done date is today to determine completion status
-    if (!isCompleted && json['last_done'] != null) {
-      try {
-        final String lastDoneStr = json['last_done'].toString();
-        if (lastDoneStr.isNotEmpty) {
-          final DateTime lastDone = DateTime.parse(lastDoneStr);
-          final DateTime now = DateTime.now();
-          if (lastDone.year == now.year &&
-              lastDone.month == now.month &&
-              lastDone.day == now.day) {
-            isCompleted = true;
-          }
-        }
-      } catch (_) {}
-    }
-
     return Habit(
       id: json['id'] ?? 0,
       userId: json['user_id'] ?? 0,
@@ -46,9 +28,11 @@ class Habit {
       nature: json['habit_nature'] ?? 'mental',
       xpValue: json['xp_value'] ?? 0,
       coverPhoto: json['cover_photo'] ?? '',
-      completed: isCompleted,
+      completed: json['done_today'] ?? false,
     );
   }
+
+  bool get doneToday => completed;
 
   Habit copyWith({
     int? id,

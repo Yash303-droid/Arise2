@@ -12,4 +12,6 @@ class Reward {
       cost: int.tryParse(json['cost']?.toString() ?? '0') ?? 0,
     );
   }
+
+  void operator [](String other) {}
 }

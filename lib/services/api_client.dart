@@ -32,7 +32,7 @@ class ApiClient {
     await _secureStorage.delete(key: 'user_id');
   }
 
-  Future<dynamic> post(String path, dynamic data, {bool requireAuth = false}) async {
+  Future<dynamic> post(String path, dynamic requestData, {bool requireAuth = false}) async {
     final uri = Uri.parse('$baseUrl$path');
     final headers = {'Content-Type': 'application/json'};
 
@@ -47,7 +47,7 @@ class ApiClient {
     final response = await _client.post(
       uri,
       headers: headers,
-      body: jsonEncode(data),
+      body: jsonEncode(requestData),
     );
 
     return _handleResponse(response);
@@ -69,7 +69,7 @@ class ApiClient {
     return _handleResponse(response);
   }
 
-  Future<dynamic> put(String path, dynamic data, {bool requireAuth = true}) async {
+  Future<dynamic> put(String path, dynamic requestData, {bool requireAuth = true}) async {
     final uri = Uri.parse('$baseUrl$path');
     final headers = {'Content-Type': 'application/json'};
 
@@ -84,13 +84,13 @@ class ApiClient {
     final response = await _client.put(
       uri,
       headers: headers,
-      body: jsonEncode(data),
+      body: jsonEncode(requestData),
     );
 
     return _handleResponse(response);
   }
 
-  Future<void> delete(String path, {bool requireAuth = true}) async {
+  Future<dynamic> delete(String path, {bool requireAuth = true}) async {
      final uri = Uri.parse('$baseUrl$path');
     final headers = {'Content-Type': 'application/json'};
 
@@ -102,9 +102,7 @@ class ApiClient {
       headers['Authorization'] = 'Bearer $token';
     }
     final response = await _client.delete(uri, headers: headers);
-     if (response.statusCode != 200 && response.statusCode != 204) {
-      _handleError(response);
-    }
+    return _handleResponse(response);
   }
 
 

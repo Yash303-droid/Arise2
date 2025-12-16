@@ -14,10 +14,12 @@ class GameViewModel extends ChangeNotifier {
 
   // Dashboard Data
   int _level = 1;
+  String _levelName = 'Beginner';
   int _currentXp = 0;
   int _maxXp = 100; // Assuming 100 XP per level for now
   
   int get level => _level;
+  String get levelName => _levelName;
   int get currentXp => _currentXp;
   int get maxXp => _maxXp;
 
@@ -35,9 +37,27 @@ class GameViewModel extends ChangeNotifier {
   String? _lastMessage;
   String? get lastMessage => _lastMessage;
 
-  Future<void> loadDashboardData() async {
-    _isLoading = true;
-    notifyListeners();
+  // Analytics & Projections
+  int get potentialDailyXp => _habits.fold(0, (sum, habit) => sum + habit.xpValue);
+
+  Map<String, int> get habitsByNature {
+    final map = <String, int>{};
+    for (final habit in _habits) {
+      map[habit.nature] = (map[habit.nature] ?? 0) + 1;
+    }
+    return map;
+  }
+
+  double get dailyCompletionRate {
+    if (_habits.isEmpty) return 0.0;
+    return _habits.where((h) => h.doneToday).length / _habits.length;
+  }
+
+  Future<void> loadDashboardData({bool silent = false}) async {
+    if (!silent) {
+      _isLoading = true;
+      notifyListeners();
+    }
 
     try {
       // 1. Fetch Profile (using /auth/me with token)
@@ -48,6 +68,7 @@ class GameViewModel extends ChangeNotifier {
           _profile = Profile.fromJson(profileData);
           _level = _profile?.level ?? 1;
           _currentXp = _profile?.xp ?? 0;
+          _levelName = profileData['level_name']?.toString() ?? 'Beginner';
         }
       } catch (e) {
         print('Error fetching profile: $e');
@@ -70,12 +91,11 @@ class GameViewModel extends ChangeNotifier {
 
       // 3. Fetch Habits
       try {
-        final habitsData = await apiClient.get('/habits/?user_id=$userId', requireAuth: true);
+        final habitsData = await apiClient.get('/habits/', requireAuth: true);
         if (habitsData is List) {
-          final loadedHabits = habitsData.map((data) => Habit.fromJson(data as Map<String, dynamic>)).toList();
-          // Deduplicate habits based on ID to prevent duplicates if API returns them
-          final seenIds = <int>{};
-          _habits = loadedHabits.where((habit) => seenIds.add(habit.id)).toList();
+          _habits = habitsData
+              .map((data) => Habit.fromJson(data as Map<String, dynamic>))
+              .toList();
         }
       } catch (e) {
         print('Error fetching habits: $e');
@@ -125,58 +145,32 @@ class GameViewModel extends ChangeNotifier {
       }
 
       // Fallback: refresh data after creation
-      await loadDashboardData();
+      await loadDashboardData(silent: true);
     } catch (e) {
       print('Error creating habit: $e');
       rethrow;
     }
   }
 
-  Future<void> deleteHabit(int habitId) async {
-    try {
-      await apiClient.delete('/habits/$habitId', requireAuth: true);
-      await loadDashboardData();
-    } catch (e) {
-      print('Error deleting habit: $e');
-    }
-  }
-
   Future<Map<String, dynamic>?> markHabitDone(int habitId) async {
     try {
       final response = await apiClient.post('/habits/$habitId/done', {
-        "habit_id": habitId
+        "habit_id": habitId,
       }, requireAuth: true);
 
       // Update local state from response
       if (response is Map<String, dynamic>) {
         final respMap = response.cast<String, dynamic>();
 
-        // Merge server profile fields if present
-        if (_profile != null) {
-          final merged = {..._profile!.toJson(), ...respMap};
-          _profile = Profile.fromJson(merged);
-        } else {
-          _profile = Profile.fromJson(respMap);
-        }
-
-        // Keep top-level XP/level in sync
-        _currentXp = _profile?.xp ?? _currentXp;
-        _level = _profile?.level ?? _level;
-
-        // Mark the habit locally as completed so UI updates immediately
-        final idx = _habits.indexWhere((h) => h.id == habitId);
-        if (idx != -1) {
-          final updated = _habits[idx].copyWith(completed: true);
-          _habits[idx] = updated;
-        }
+        // Refresh data from server to ensure sync
+        await loadDashboardData(silent: true);
 
         // expose server message for UI feedback
         if (respMap.containsKey('message')) {
           _lastMessage = respMap['message']?.toString();
         }
 
-        // Force refresh to ensure Streak, Rank, and other server-side stats are synced
-        await loadDashboardData();
+        
         notifyListeners();
         return respMap;
       }
@@ -184,6 +178,20 @@ class GameViewModel extends ChangeNotifier {
       print('Error marking habit done: $e');
     }
     return null;
+  }
+
+  Future<bool> deleteHabit(int habitId) async {
+    try {
+      final response = await apiClient.delete('/habits/$habitId', requireAuth: true);
+      if (response is Map<String, dynamic> && response.containsKey('message')) {
+        _habits.removeWhere((h) => h.id == habitId);
+        notifyListeners();
+        return true;
+      }
+    } catch (e) {
+      print('Error deleting habit: $e');
+    }
+    return false;
   }
 
   void clearLastMessage() {
@@ -204,7 +212,7 @@ class GameViewModel extends ChangeNotifier {
       "reward_id": rewardId
     });
 
-    if (response is Map<String, dynamic>) {
+    if (response != null && response is Map<String, dynamic>) {
       // Refresh profile (Gold/XP) and Rewards list
       await loadDashboardData();
     }

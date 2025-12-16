@@ -5,7 +5,7 @@ import 'package:arise2/screens/streak_viewmodel.dart';
 import 'package:arise2/services/api_client.dart';
 import 'package:arise2/services/auth_service.dart';
 import 'package:arise2/view_models/auth_viewmodel.dart';
-import 'package:arise2/viewmodels/auth_viewmodel.dart';
+
 import 'package:arise2/view_models/game_viewmodel.dart';
 
 import 'package:flutter/material.dart';
@@ -43,11 +43,16 @@ class AriseApp extends StatelessWidget {
         useMaterial3: true,
         brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 147, 229, 250),
+          seedColor: const Color(0xFF00E5FF),
           brightness: Brightness.dark,
-          surface: const Color.fromARGB(255, 42, 51, 59),
+          surface: const Color(0xFF1E1E2C),
+          background: const Color(0xFF121212),
         ),
-        scaffoldBackgroundColor: const Color.fromARGB(255, 50, 58, 60),
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+        ),
       ),
       home: Consumer<AuthViewModel>(
         builder: (context, authVM, child) {

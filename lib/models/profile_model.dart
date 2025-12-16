@@ -41,6 +41,8 @@ class Profile {
     );
   }
 
+  get levelName => null;
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

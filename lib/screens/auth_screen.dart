@@ -60,154 +60,237 @@ class _AuthScreenState extends State<AuthScreen> {
       // Using a Stack to layer the background, blur, and content
       body: Stack(
         children: [
-          // You can replace this with a background image if you have one
+          // Background Gradient
           Container(
             decoration: const BoxDecoration(
-              color: Colors.black,
-              // Example of adding a background image:
-              // image: DecorationImage(
-              //   image: AssetImage("assets/images/background.png"),
-              //   fit: BoxFit.cover,
-              // ),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF121212), Color(0xFF2A2A3E)],
+              ),
             ),
           ),
-          // This creates the blur effect over the background
-          BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          // Decorative circles for background
+          Positioned(
+            top: -100,
+            left: -100,
             child: Container(
-              color: Colors.black.withOpacity(0.1),
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF00E5FF).withOpacity(0.1),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF00E5FF).withOpacity(0.2),
+                    blurRadius: 100,
+                    spreadRadius: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -50,
+            right: -50,
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.purpleAccent.withOpacity(0.1),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.purpleAccent.withOpacity(0.2),
+                    blurRadius: 100,
+                    spreadRadius: 20,
+                  ),
+                ],
+              ),
             ),
           ),
           Center(
             child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Container(
-                  margin: const EdgeInsets.all(20),
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.2)),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Arise',
-                        style: TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      padding: const EdgeInsets.all(32),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: Colors.white.withOpacity(0.1)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 20),
-                      if (!_isLogin)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0),
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              labelText: 'Username',
-                              prefixIcon: Icon(Icons.person),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'ARISE',
+                              style: TextStyle(
+                                fontSize: 48,
+                                letterSpacing: 2,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF00E5FF),
+                              ),
                             ),
-                            enableSuggestions: false,
-                            validator: (value) {
-                              if (value == null ||
-                                  value.isEmpty ||
-                                  value.trim().length < 4) {
-                                return 'Please enter at least 4 characters.';
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _enteredUsername = value!;
-                            },
-                          ),
-                        ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: 'Email Address',
-                            prefixIcon: Icon(Icons.email),
-                          ),
-                          keyboardType: TextInputType.emailAddress,
-                          autocorrect: false,
-                          textCapitalization: TextCapitalization.none,
-                          validator: (value) {
-                            if (value == null ||
-                                value.trim().isEmpty ||
-                                !value.contains('@')) {
-                              return 'Please enter a valid email address.';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) {
-                            _enteredEmail = value!;
-                          },
-                        ),
-                      ),
-                      TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Password',
-                          prefixIcon: Icon(Icons.lock),
-                        ),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.trim().length < 6) {
-                            return 'Password must be at least 6 characters long.';
-                          }
-                          return null;
-                        },
-                        onSaved: (value) {
-                          _enteredPassword = value!;
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      if (_isLoading)
-                        const CircularProgressIndicator()
-                      else
-                        ElevatedButton(
-                          onPressed: _submit,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 40,
-                              vertical: 16,
+                            const SizedBox(height: 16),
+                            Text(
+                              _isLogin ? 'Welcome Back' : 'Join Arise',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: 2,
+                              ),
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
+                            const SizedBox(height: 32),
+                            if (!_isLogin)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 20.0),
+                                child: TextFormField(
+                                  style: const TextStyle(color: Colors.white),
+                                  decoration: _buildInputDecoration('Username', Icons.person),
+                                  enableSuggestions: false,
+                                  validator: (value) {
+                                    if (value == null ||
+                                        value.isEmpty ||
+                                        value.trim().length < 4) {
+                                      return 'Please enter at least 4 characters.';
+                                    }
+                                    return null;
+                                  },
+                                  onSaved: (value) {
+                                    _enteredUsername = value!;
+                                  },
+                                ),
+                              ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 20.0),
+                              child: TextFormField(
+                                style: const TextStyle(color: Colors.white),
+                                decoration: _buildInputDecoration('Email Address', Icons.email),
+                                keyboardType: TextInputType.emailAddress,
+                                autocorrect: false,
+                                textCapitalization: TextCapitalization.none,
+                                validator: (value) {
+                                  if (value == null ||
+                                      value.trim().isEmpty ||
+                                      !value.contains('@')) {
+                                    return 'Please enter a valid email address.';
+                                  }
+                                  return null;
+                                },
+                                onSaved: (value) {
+                                  _enteredEmail = value!;
+                                },
+                              ),
                             ),
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            foregroundColor:
-                                Theme.of(context).colorScheme.onPrimary,
-                          ),
-                          child: Text(_isLogin ? 'Login' : 'Signup'),
-                        ),
-                      const SizedBox(height: 12),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _isLogin = !_isLogin;
-                          });
-                        },
-                        child: Text(
-                          _isLogin
-                              ? 'Create an account'
-                              : 'I already have an account',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                            TextFormField(
+                              style: const TextStyle(color: Colors.white),
+                              decoration: _buildInputDecoration('Password', Icons.lock),
+                              obscureText: true,
+                              validator: (value) {
+                                if (value == null || value.trim().length < 6) {
+                                  return 'Password must be at least 6 characters long.';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) {
+                                _enteredPassword = value!;
+                              },
+                            ),
+                            const SizedBox(height: 32),
+                            if (_isLoading)
+                              const CircularProgressIndicator(color: Color(0xFF00E5FF))
+                            else
+                              SizedBox(
+                                width: double.infinity,
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: _submit,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF00E5FF),
+                                    foregroundColor: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    elevation: 5,
+                                    shadowColor: const Color(0xFF00E5FF).withOpacity(0.5),
+                                  ),
+                                  child: Text(
+                                    _isLogin ? 'LOGIN' : 'SIGN UP',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(height: 16),
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _isLogin = !_isLogin;
+                                });
+                              },
+                              child: Text(
+                                _isLogin
+                                    ? 'Create an account'
+                                    : 'I already have an account',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  InputDecoration _buildInputDecoration(String label, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: Colors.white54),
+      prefixIcon: Icon(icon, color: const Color(0xFF00E5FF)),
+      filled: true,
+      fillColor: Colors.white.withOpacity(0.05),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Color(0xFF00E5FF)),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.redAccent),
       ),
     );
   }
